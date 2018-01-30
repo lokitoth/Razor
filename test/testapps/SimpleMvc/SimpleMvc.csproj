@@ -12,4 +12,10 @@
     <!-- Workaround until we get a new SDK build -->
     <ResolvedRazorCompileToolset Condition="'$(RazorCompileToolset)'==''">RazorSDK</ResolvedRazorCompileToolset>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="../SimplePages/Pages/_Layout.cshtml">
+      <Link>Pages/_Layout.cshtml</Link>
+    </Content>
+  </ItemGroup>
 </Project>

@@ -67,16 +67,4 @@ Copyright (c) .NET Foundation. All rights reserved.
     <ProjectCapability Include="DotNetCoreRazor"/>
   </ItemGroup>
 
-  <ItemGroup> 
-    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\RazorConfiguration.xaml">
-      <Context>File</Context>
-    </PropertyPageSchema>
-    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\RazorExtension.xaml">
-      <Context>File</Context>
-    </PropertyPageSchema>
-    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Rules\RazorGeneral.xaml">
-      <Context>Project</Context>
-    </PropertyPageSchema>
-  </ItemGroup>
-
 </Project>

@@ -13,12 +13,20 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal class Application : CommandLineApplication
     {
-        public Application(CancellationToken cancellationToken, ExtensionAssemblyLoader loader, ExtensionDependencyChecker checker, Func<string, MetadataReferenceProperties, PortableExecutableReference> assemblyReferenceProvider)
+        public Application(
+            CancellationToken cancellationToken,
+            ExtensionAssemblyLoader loader,
+            ExtensionDependencyChecker checker,
+            Func<string, MetadataReferenceProperties, PortableExecutableReference> assemblyReferenceProvider,
+            TextWriter output = null,
+            TextWriter error = null)
         {
             CancellationToken = cancellationToken;
             Checker = checker;
             Loader = loader;
             AssemblyReferenceProvider = assemblyReferenceProvider;
+            Out = output ?? Out;
+            Error = error ?? Error;
 
             Name = "rzc";
             FullName = "Microsoft ASP.NET Core Razor CLI tool";
@@ -27,10 +35,10 @@ namespace Microsoft.AspNetCore.Razor.Tools
 
             HelpOption("-?|-h|--help");
 
-            Commands.Add(new ServerCommand(this));
-            Commands.Add(new ShutdownCommand(this));
-            Commands.Add(new DiscoverCommand(this));
-            Commands.Add(new GenerateCommand(this));
+            Commands.Add(new ServerCommand(this, Out, Error));
+            Commands.Add(new ShutdownCommand(this, Out, Error));
+            Commands.Add(new DiscoverCommand(this, Out, Error));
+            Commands.Add(new GenerateCommand(this, Out, Error));
         }
 
         public CancellationToken CancellationToken { get; }

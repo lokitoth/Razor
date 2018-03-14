@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.CommandLineUtils;
@@ -10,7 +11,7 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal abstract class CommandBase : CommandLineApplication
     {
-        protected CommandBase(Application parent, string name)
+        protected CommandBase(Application parent, string name, TextWriter output, TextWriter error)
             : base(throwOnUnexpectedArg: true)
         {
             if (parent == null)
@@ -20,6 +21,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
 
             base.Parent = parent;
             Name = name;
+            Out = output ?? Out;
+            Error = error ?? Error;
 
             Help = HelpOption("-?|-h|--help");
             OnExecute((Func<Task<int>>)ExecuteAsync);

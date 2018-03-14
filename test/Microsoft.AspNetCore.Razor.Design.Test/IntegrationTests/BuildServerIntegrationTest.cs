@@ -84,5 +84,21 @@ namespace Microsoft.AspNetCore.Razor.Design.IntegrationTests
             Assert.FileExists(result, IntermediateOutputPath, "Whitespace in name.RazorCoreGenerate.cache");
             Assert.FileExists(result, RazorIntermediateOutputPath, "Views", "Home", "Index.cs");
         }
+
+        [Fact]
+        [InitializeTestProject("SimpleMvc")]
+        public async Task Build_ErrorInServer_DisplaysErrorInMsBuildOutput()
+        {
+            var result = await DotnetMSBuild(
+                "Build",
+                "/p:_RazorForceBuildServer=true /p:RazorLangVersion=5.0");
+
+            Assert.BuildFailed(result);
+            Assert.BuildOutputContainsLine(result, "5.0 is not a valid language version.");
+
+            // Compilation failed without creating the views assembly
+            Assert.FileExists(result, IntermediateOutputPath, "SimpleMvc.dll");
+            Assert.FileDoesNotExist(result, IntermediateOutputPath, "SimpleMvc.Views.dll");
+        }
     }
 }

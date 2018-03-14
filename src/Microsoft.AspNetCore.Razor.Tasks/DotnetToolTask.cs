@@ -148,9 +148,18 @@ namespace Microsoft.AspNetCore.Razor.Tasks
                     }
                     else
                     {
-                        Log.LogMessage(
-                            StandardOutputLoggingImportance,
-                            $"Server execution completed with return code {result}. For more info, check the server log file in the location specified by the RAZORBUILDSERVER_LOG environment variable.");
+                        Log.LogMessage(StandardOutputLoggingImportance, $"Server execution completed with return code {result}. For more info, check the server log file in the location specified by the RAZORBUILDSERVER_LOG environment variable.");
+
+                        if (LogStandardErrorAsError)
+                        {
+                            Log.LogError(completedResponse.ErrorOutput);
+                        }
+                        else
+                        {
+                            Log.LogMessage(StandardErrorLoggingImportance, completedResponse.ErrorOutput);
+                        }
+
+                        return true;
                     }
                 }
                 else
@@ -158,9 +167,9 @@ namespace Microsoft.AspNetCore.Razor.Tasks
                     Log.LogMessage(
                         StandardOutputLoggingImportance,
                         $"Server execution failed with response {response.Type}. For more info, check the server log file in the location specified by the RAZORBUILDSERVER_LOG environment variable.");
-                }
 
-                result = -1;
+                    result = -1;
+                }
 
                 if (ForceServer)
                 {

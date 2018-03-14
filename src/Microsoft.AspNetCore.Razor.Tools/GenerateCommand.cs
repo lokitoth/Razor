@@ -15,8 +15,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal class GenerateCommand : CommandBase
     {
-        public GenerateCommand(Application parent)
-            : base(parent, "generate")
+        public GenerateCommand(Application parent, TextWriter output, TextWriter error)
+            : base(parent, "generate", output, error)
         {
             Sources = Option("-s", ".cshtml files to compile", CommandOptionType.MultipleValue);
             Outputs = Option("-o", "Generated output file path", CommandOptionType.MultipleValue);
@@ -101,7 +101,7 @@ namespace Microsoft.AspNetCore.Razor.Tools
             }
             else if (!RazorLanguageVersion.TryParse(Version.Value(), out _))
             {
-                Error.WriteLine($"{Version.ValueName} is not a valid language version.");
+                Error.WriteLine($"{Version.Value()} is not a valid language version.");
                 return false;
             }
 

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.CommandLineUtils;
@@ -10,8 +11,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal class ServerCommand : CommandBase
     {
-        public ServerCommand(Application parent)
-            : base(parent, "server")
+        public ServerCommand(Application parent, TextWriter output, TextWriter error)
+            : base(parent, "server", output, error)
         {
             Pipe = Option("-p|--pipe", "name of named pipe", CommandOptionType.SingleValue);
             KeepAlive = Option("-k|--keep-alive", "sets the default idle timeout for the server in seconds", CommandOptionType.SingleValue);

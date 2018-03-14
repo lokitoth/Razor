@@ -19,8 +19,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal class DiscoverCommand : CommandBase
     {
-        public DiscoverCommand(Application parent)
-            : base(parent, "discover")
+        public DiscoverCommand(Application parent, TextWriter output, TextWriter error)
+            : base(parent, "discover", output, error)
         {
             Assemblies = Argument("assemblies", "assemblies to search for tag helpers", multipleValues: true);
             TagHelperManifest = Option("-o", "output file", CommandOptionType.SingleValue);
@@ -71,7 +71,7 @@ namespace Microsoft.AspNetCore.Razor.Tools
             }
             else if (!RazorLanguageVersion.TryParse(Version.Value(), out _))
             {
-                Error.WriteLine($"{Version.ValueName} is not a valid language version.");
+                Error.WriteLine($"{Version.Value()} is not a valid language version.");
                 return false;
             }
 

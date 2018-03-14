@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.CommandLineUtils;
@@ -11,8 +12,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal class ShutdownCommand : CommandBase
     {
-        public ShutdownCommand(Application parent)
-            : base(parent, "shutdown")
+        public ShutdownCommand(Application parent, TextWriter output, TextWriter error)
+            : base(parent, "shutdown", output, error)
         {
             Pipe = Option("-p|--pipe", "name of named pipe", CommandOptionType.SingleValue);
             Wait = Option("-w|--wait", "wait for shutdown", CommandOptionType.NoValue);

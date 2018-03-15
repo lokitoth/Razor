@@ -10,6 +10,7 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Extensions
     public class RazorPageDocumentClassifierPass : DocumentClassifierPassBase
     {
         public static readonly string RazorPageDocumentKind = "mvc.1.0.razor-page";
+        public static readonly string RouteTemplateKey = "RouteTemplate";
 
         protected override string DocumentKind => RazorPageDocumentKind;
 
@@ -43,14 +44,34 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Extensions
             method.Modifiers.Add("override");
             method.ReturnType = $"global::{typeof(System.Threading.Tasks.Task).FullName}";
 
-            EnsureValidPageDirective(codeDocument);
-        }
-
-        private void EnsureValidPageDirective(RazorCodeDocument codeDocument)
-        {
             var document = codeDocument.GetDocumentIntermediateNode();
             PageDirective.TryGetPageDirective(document, out var pageDirective);
 
+            EnsureValidPageDirective(pageDirective);
+
+            AddRouteTemplateMetadataAttribute(@namespace, @class, pageDirective);
+        }
+
+        private static void AddRouteTemplateMetadataAttribute(NamespaceDeclarationIntermediateNode @namespace, ClassDeclarationIntermediateNode @class, PageDirective pageDirective)
+        {
+            if (string.IsNullOrEmpty(pageDirective.RouteTemplate))
+            {
+                return;
+            }
+
+            var classIndex = @namespace.Children.IndexOf(@class);
+            if (classIndex == -1)
+            {
+                return;
+            }
+
+            var metadataAttributeNode = new RazorCompiledItemMetadataAttributeIntermediateNode(RouteTemplateKey, pageDirective.RouteTemplate);
+            // Metadata attributes need to be inserted right before the class declaration.
+            @namespace.Children.Insert(classIndex, metadataAttributeNode);
+        }
+
+        private void EnsureValidPageDirective(PageDirective pageDirective)
+        {
             Debug.Assert(pageDirective != null);
 
             if (pageDirective.DirectiveNode.IsImported())

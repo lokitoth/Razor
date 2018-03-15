@@ -239,6 +239,31 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Extensions
             Assert.Equal(new[] { "public", "async", "override" }, visitor.Method.Modifiers);
         }
 
+        [Fact]
+        public void RazorPageDocumentClassifierPass_AddsRouteTemplateMetadata()
+        {
+            // Arrange
+            var properties = new RazorSourceDocumentProperties(filePath: "ignored", relativePath: "Test.cshtml");
+            var codeDocument = RazorCodeDocument.Create(RazorSourceDocument.Create("@page \"some-route\"", properties));
+
+            var engine = CreateEngine();
+            var irDocument = CreateIRDocument(engine, codeDocument);
+            var pass = new RazorPageDocumentClassifierPass
+            {
+                Engine = engine
+            };
+
+            // Act
+            pass.Execute(codeDocument, irDocument);
+            var visitor = new Visitor();
+            visitor.Visit(irDocument);
+
+            // Assert
+            var attributeNode = Assert.IsType<RazorCompiledItemMetadataAttributeIntermediateNode>(visitor.ExtensionNode);
+            Assert.Equal("RouteTemplate", attributeNode.Key);
+            Assert.Equal("some-route", attributeNode.Value);
+        }
+
         private static RazorEngine CreateEngine()
         {
             return RazorEngine.Create(b =>
@@ -271,6 +296,8 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Extensions
 
             public MethodDeclarationIntermediateNode Method { get; private set; }
 
+            public ExtensionIntermediateNode ExtensionNode { get; private set; }
+
             public override void VisitMethodDeclaration(MethodDeclarationIntermediateNode node)
             {
                 Method = node;
@@ -286,6 +313,11 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Extensions
             {
                 Class = node;
                 base.VisitClassDeclaration(node);
+            }
+
+            public override void VisitExtension(ExtensionIntermediateNode node)
+            {
+                ExtensionNode = node;
             }
         }
     }

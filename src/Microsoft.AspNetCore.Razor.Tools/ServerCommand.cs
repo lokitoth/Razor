@@ -11,8 +11,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal class ServerCommand : CommandBase
     {
-        public ServerCommand(Application parent, TextWriter output, TextWriter error)
-            : base(parent, "server", output, error)
+        public ServerCommand(Application parent)
+            : base(parent, "server")
         {
             Pipe = Option("-p|--pipe", "name of named pipe", CommandOptionType.SingleValue);
             KeepAlive = Option("-k|--keep-alive", "sets the default idle timeout for the server in seconds", CommandOptionType.SingleValue);

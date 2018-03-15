@@ -35,10 +35,10 @@ namespace Microsoft.AspNetCore.Razor.Tools
 
             HelpOption("-?|-h|--help");
 
-            Commands.Add(new ServerCommand(this, Out, Error));
-            Commands.Add(new ShutdownCommand(this, Out, Error));
-            Commands.Add(new DiscoverCommand(this, Out, Error));
-            Commands.Add(new GenerateCommand(this, Out, Error));
+            Commands.Add(new ServerCommand(this));
+            Commands.Add(new ShutdownCommand(this));
+            Commands.Add(new DiscoverCommand(this));
+            Commands.Add(new GenerateCommand(this));
         }
 
         public CancellationToken CancellationToken { get; }

@@ -12,8 +12,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal class ShutdownCommand : CommandBase
     {
-        public ShutdownCommand(Application parent, TextWriter output, TextWriter error)
-            : base(parent, "shutdown", output, error)
+        public ShutdownCommand(Application parent)
+            : base(parent, "shutdown")
         {
             Pipe = Option("-p|--pipe", "name of named pipe", CommandOptionType.SingleValue);
             Wait = Option("-w|--wait", "wait for shutdown", CommandOptionType.NoValue);

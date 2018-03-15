@@ -152,11 +152,11 @@ namespace Microsoft.AspNetCore.Razor.Tasks
 
                         if (LogStandardErrorAsError)
                         {
-                            Log.LogError(completedResponse.ErrorOutput);
+                            LogErrors(completedResponse.ErrorOutput);
                         }
                         else
                         {
-                            Log.LogMessage(StandardErrorLoggingImportance, completedResponse.ErrorOutput);
+                            LogMessages(completedResponse.ErrorOutput, StandardErrorLoggingImportance);
                         }
 
                         return true;
@@ -181,6 +181,32 @@ namespace Microsoft.AspNetCore.Razor.Tasks
             }
 
             return false;
+        }
+
+        private void LogMessages(string output, MessageImportance messageImportance)
+        {
+            var lines = output.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                var trimmedMessage = line.Trim();
+                if (trimmedMessage != string.Empty)
+                {
+                    Log.LogMessageFromText(trimmedMessage, messageImportance);
+                }
+            }
+        }
+
+        private void LogErrors(string output)
+        {
+            var lines = output.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                var trimmedMessage = line.Trim();
+                if (trimmedMessage != string.Empty)
+                {
+                    Log.LogError(trimmedMessage);
+                }
+            }
         }
 
         /// <summary>

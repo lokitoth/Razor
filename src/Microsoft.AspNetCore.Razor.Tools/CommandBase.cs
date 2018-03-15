@@ -11,7 +11,7 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal abstract class CommandBase : CommandLineApplication
     {
-        protected CommandBase(Application parent, string name, TextWriter output, TextWriter error)
+        protected CommandBase(Application parent, string name)
             : base(throwOnUnexpectedArg: true)
         {
             if (parent == null)
@@ -21,8 +21,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
 
             base.Parent = parent;
             Name = name;
-            Out = output ?? Out;
-            Error = error ?? Error;
+            Out = parent.Out ?? Out;
+            Error = parent.Error ?? Error;
 
             Help = HelpOption("-?|-h|--help");
             OnExecute((Func<Task<int>>)ExecuteAsync);

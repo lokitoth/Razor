@@ -19,8 +19,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal class DiscoverCommand : CommandBase
     {
-        public DiscoverCommand(Application parent, TextWriter output, TextWriter error)
-            : base(parent, "discover", output, error)
+        public DiscoverCommand(Application parent)
+            : base(parent, "discover")
         {
             Assemblies = Argument("assemblies", "assemblies to search for tag helpers", multipleValues: true);
             TagHelperManifest = Option("-o", "output file", CommandOptionType.SingleValue);

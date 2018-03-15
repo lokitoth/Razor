@@ -15,8 +15,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
 {
     internal class GenerateCommand : CommandBase
     {
-        public GenerateCommand(Application parent, TextWriter output, TextWriter error)
-            : base(parent, "generate", output, error)
+        public GenerateCommand(Application parent)
+            : base(parent, "generate")
         {
             Sources = Option("-s", ".cshtml files to compile", CommandOptionType.MultipleValue);
             Outputs = Option("-o", "Generated output file path", CommandOptionType.MultipleValue);
@@ -168,7 +168,7 @@ namespace Microsoft.AspNetCore.Razor.Tools
                     success = false;
                     foreach (var error in result.CSharpDocument.Diagnostics)
                     {
-                        Console.Error.WriteLine(error.ToString());
+                        Error.WriteLine(error.ToString());
                     }
                 }
 

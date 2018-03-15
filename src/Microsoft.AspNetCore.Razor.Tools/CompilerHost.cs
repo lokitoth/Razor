@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using Microsoft.CodeAnalysis;
 
@@ -49,20 +48,21 @@ namespace Microsoft.AspNetCore.Razor.Tools
                 }
 
                 var exitCode = 0;
-                var output = string.Empty;
-                var error = string.Empty;
                 var commandArgs = parsed.args.ToArray();
 
-                var outputWriter = new StringWriter();
-                var errorWriter = new StringWriter();
+                var outputWriter = new LazyStringWriter();
+                var errorWriter = new LazyStringWriter();
 
                 var checker = new DefaultExtensionDependencyChecker(Loader, outputWriter, errorWriter);
                 var app = new Application(cancellationToken, Loader, checker, AssemblyReferenceProvider, outputWriter, errorWriter);
 
                 exitCode = app.Execute(commandArgs);
 
-                output = outputWriter.ToString();
-                error = errorWriter.ToString();
+                var output = outputWriter.ToString();
+                var error = errorWriter.ToString();
+
+                outputWriter.Dispose();
+                errorWriter.Dispose();
 
                 // This will no-op if server logging is not enabled.
                 ServerLogger.Log(output);

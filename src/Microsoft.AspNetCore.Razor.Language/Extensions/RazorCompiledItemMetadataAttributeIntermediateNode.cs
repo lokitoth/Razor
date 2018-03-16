@@ -5,24 +5,22 @@ using System;
 using Microsoft.AspNetCore.Razor.Language.CodeGeneration;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
 
-namespace Microsoft.AspNetCore.Mvc.Razor.Extensions
+namespace Microsoft.AspNetCore.Razor.Language.Extensions
 {
-    internal class RazorCompiledItemMetadataAttributeIntermediateNode : ExtensionIntermediateNode
+    public class RazorCompiledItemMetadataAttributeIntermediateNode : ExtensionIntermediateNode
     {
-        private const string AttributeName = "global::Microsoft.AspNetCore.Razor.Hosting.RazorCompiledItemMetadataAttribute";
-
         public override IntermediateNodeCollection Children => IntermediateNodeCollection.ReadOnly;
 
         public RazorCompiledItemMetadataAttributeIntermediateNode(string key, string value)
         {
             if (string.IsNullOrEmpty(key))
             {
-                throw new ArgumentException(Resources.ArgumentCannotBeNullOrEmpy, nameof(key));
+                throw new ArgumentException(Resources.ArgumentCannotBeNullOrEmpty, nameof(key));
             }
 
             if (string.IsNullOrEmpty(value))
             {
-                throw new ArgumentException(Resources.ArgumentCannotBeNullOrEmpy, nameof(value));
+                throw new ArgumentException(Resources.ArgumentCannotBeNullOrEmpty, nameof(value));
             }
 
             Key = key;
@@ -55,14 +53,14 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Extensions
                 throw new ArgumentNullException(nameof(context));
             }
 
-            // [global::...RazorCompiledItemMetadataAttribute(@"{Key}", @"{Value}")]
-            context.CodeWriter.Write("[");
-            context.CodeWriter.Write(AttributeName);
-            context.CodeWriter.Write("(@\"");
-            context.CodeWriter.Write(Key);
-            context.CodeWriter.Write("\", @\"");
-            context.CodeWriter.Write(Value);
-            context.CodeWriter.WriteLine("\")]");
+            var extension = target.GetExtension<IMetadataAttributeTargetExtension>();
+            if (extension == null)
+            {
+                ReportMissingCodeTargetExtension<IMetadataAttributeTargetExtension>(context);
+                return;
+            }
+
+            extension.WriteRazorCompiledItemMetadataAttribute(context, this);
         }
     }
 }

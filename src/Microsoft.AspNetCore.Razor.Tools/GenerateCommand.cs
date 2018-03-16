@@ -166,8 +166,11 @@ namespace Microsoft.AspNetCore.Razor.Tools
                 if (result.CSharpDocument.Diagnostics.Count > 0)
                 {
                     success = false;
-                    foreach (var error in result.CSharpDocument.Diagnostics)
+
+                    // Only show the first 100 errors to prevent massive string allocations.
+                    for (var i = 0; i < result.CSharpDocument.Diagnostics.Count && i < 100; i++)
                     {
+                        var error = result.CSharpDocument.Diagnostics[i];
                         Error.WriteLine(error.ToString());
                     }
                 }

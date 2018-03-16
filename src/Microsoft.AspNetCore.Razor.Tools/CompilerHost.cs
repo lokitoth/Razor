@@ -50,8 +50,8 @@ namespace Microsoft.AspNetCore.Razor.Tools
                 var exitCode = 0;
                 var commandArgs = parsed.args.ToArray();
 
-                var outputWriter = new LazyStringWriter();
-                var errorWriter = new LazyStringWriter();
+                var outputWriter = new StringWriter();
+                var errorWriter = new StringWriter();
 
                 var checker = new DefaultExtensionDependencyChecker(Loader, outputWriter, errorWriter);
                 var app = new Application(cancellationToken, Loader, checker, AssemblyReferenceProvider, outputWriter, errorWriter);

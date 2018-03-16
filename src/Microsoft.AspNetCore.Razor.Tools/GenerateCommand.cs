@@ -163,15 +163,22 @@ namespace Microsoft.AspNetCore.Razor.Tools
 
             foreach (var result in results)
             {
-                if (result.CSharpDocument.Diagnostics.Count > 0)
+                var errorCount = result.CSharpDocument.Diagnostics.Count;
+                if (errorCount > 0)
                 {
                     success = false;
 
-                    // Only show the first 100 errors to prevent massive string allocations.
-                    for (var i = 0; i < result.CSharpDocument.Diagnostics.Count && i < 100; i++)
+                    for (var i = 0; i < errorCount; i++)
                     {
                         var error = result.CSharpDocument.Diagnostics[i];
                         Error.WriteLine(error.ToString());
+
+                        // Only show the first 100 errors to prevent massive string allocations.
+                        if (i == 99)
+                        {
+                            Error.WriteLine($"And {errorCount - i + 1} more errors.");
+                            break;
+                        }
                     }
                 }
 

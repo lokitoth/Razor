@@ -188,9 +188,9 @@ namespace Microsoft.AspNetCore.Razor.Tasks
             var lines = output.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)
             {
-                var trimmedMessage = line.Trim();
-                if (trimmedMessage != string.Empty)
+                if (!string.IsNullOrWhiteSpace(line))
                 {
+                    var trimmedMessage = line.Trim();
                     Log.LogMessageFromText(trimmedMessage, messageImportance);
                 }
             }
@@ -201,9 +201,9 @@ namespace Microsoft.AspNetCore.Razor.Tasks
             var lines = output.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)
             {
-                var trimmedMessage = line.Trim();
-                if (trimmedMessage != string.Empty)
+                if (!string.IsNullOrWhiteSpace(line))
                 {
+                    var trimmedMessage = line.Trim();
                     Log.LogError(trimmedMessage);
                 }
             }

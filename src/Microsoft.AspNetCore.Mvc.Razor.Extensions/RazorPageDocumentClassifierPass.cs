@@ -10,6 +10,21 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Extensions
     public class RazorPageDocumentClassifierPass : DocumentClassifierPassBase
     {
         public static readonly string RazorPageDocumentKind = "mvc.1.0.razor-page";
+        private static readonly RazorEngine LeadingDirectiveParsingEngine = RazorEngine.Create(builder =>
+        {
+            for (var i = builder.Phases.Count - 1; i >= 0; i--)
+            {
+                var phase = builder.Phases[i];
+                builder.Phases.RemoveAt(i);
+                if (phase is IRazorDocumentClassifierPhase)
+                {
+                    break;
+                }
+            }
+
+            RazorExtensions.Register(builder);
+            builder.Features.Add(new LeadingDirectiveParserOptionsFeature());
+        });
 
         protected override string DocumentKind => RazorPageDocumentKind;
 
@@ -57,6 +72,32 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Extensions
             {
                 pageDirective.DirectiveNode.Diagnostics.Add(
                     RazorExtensionsDiagnosticFactory.CreatePageDirective_CannotBeImported(pageDirective.DirectiveNode.Source.Value));
+            }
+            else
+            {
+                // The document contains a page directive and it is not imported.
+                // We now want to make sure this page directive exists at the top of the file.
+                var sourceDocument = codeDocument.Source;
+                var leadingDirectiveCodeDocument = RazorCodeDocument.Create(sourceDocument);
+                LeadingDirectiveParsingEngine.Process(leadingDirectiveCodeDocument);
+
+                var documentIRNode = leadingDirectiveCodeDocument.GetDocumentIntermediateNode();
+                if (!PageDirective.TryGetPageDirective(documentIRNode, out var _))
+                {
+                    // The page directive is not the leading directive. Add an error.
+                    pageDirective.DirectiveNode.Diagnostics.Add(
+                        RazorExtensionsDiagnosticFactory.CreatePageDirective_MustExistAtTheTopOfFile(pageDirective.DirectiveNode.Source.Value));
+                }
+            }
+        }
+
+        private class LeadingDirectiveParserOptionsFeature : RazorEngineFeatureBase, IConfigureRazorParserOptionsFeature
+        {
+            public int Order { get; }
+
+            public void Configure(RazorParserOptionsBuilder options)
+            {
+                options.ParseLeadingDirectives = true;
             }
         }
     }

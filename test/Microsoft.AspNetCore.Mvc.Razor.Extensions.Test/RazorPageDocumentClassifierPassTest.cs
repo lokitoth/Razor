@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System;
 using Microsoft.AspNetCore.Razor.Language;
 using Microsoft.AspNetCore.Razor.Language.Intermediate;
 using Xunit;
@@ -33,6 +34,66 @@ namespace Microsoft.AspNetCore.Mvc.Razor.Extensions
             var directive = Assert.Single(pageDirectives);
             var diagnostic = Assert.Single(directive.Node.Diagnostics);
             Assert.Equal(expectedDiagnostic, diagnostic);
+        }
+
+        [Fact]
+        public void RazorPageDocumentClassifierPass_LogsErrorIfDirectiveNotAtTopOfFile()
+        {
+            // Arrange
+            var sourceSpan = new SourceSpan("Test.cshtml", 16 + Environment.NewLine.Length, 2, 0, 5 + Environment.NewLine.Length);
+            var expectedDiagnostic = RazorExtensionsDiagnosticFactory.CreatePageDirective_MustExistAtTheTopOfFile(sourceSpan);
+            var content = @"
+@somethingelse
+@page
+";
+            var codeDocument = RazorCodeDocument.Create(RazorSourceDocument.Create(content, "Test.cshtml"));
+
+            var engine = CreateEngine();
+            var irDocument = CreateIRDocument(engine, codeDocument);
+            var pass = new RazorPageDocumentClassifierPass
+            {
+                Engine = engine
+            };
+
+            // Act
+            pass.Execute(codeDocument, irDocument);
+            var visitor = new Visitor();
+            visitor.Visit(irDocument);
+
+            // Assert
+            var pageDirectives = irDocument.FindDirectiveReferences(PageDirective.Directive);
+            var directive = Assert.Single(pageDirectives);
+            var diagnostic = Assert.Single(directive.Node.Diagnostics);
+            Assert.Equal(expectedDiagnostic, diagnostic);
+        }
+
+        [Fact]
+        public void RazorPageDocumentClassifierPass_DoesNotLogErrorIfCommentAndWhitespaceBeforeDirective()
+        {
+            // Arrange
+            var content = @"
+@* some comment *@
+     
+@page
+";
+            var codeDocument = RazorCodeDocument.Create(RazorSourceDocument.Create(content, "Test.cshtml"));
+
+            var engine = CreateEngine();
+            var irDocument = CreateIRDocument(engine, codeDocument);
+            var pass = new RazorPageDocumentClassifierPass
+            {
+                Engine = engine
+            };
+
+            // Act
+            pass.Execute(codeDocument, irDocument);
+            var visitor = new Visitor();
+            visitor.Visit(irDocument);
+
+            // Assert
+            var pageDirectives = irDocument.FindDirectiveReferences(PageDirective.Directive);
+            var directive = Assert.Single(pageDirectives);
+            Assert.Empty(directive.Node.Diagnostics);
         }
 
         [Fact]
